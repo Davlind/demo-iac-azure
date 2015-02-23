@@ -21,7 +21,7 @@ configuration DemoConfig {
             Path = "C:\Downloads\GoogleChromeStandaloneEnterprise.msi"
             Name = "Google Chrome"
             ProductId = ''
-            DependsOn = "[xRemoteFile]DownloadChrome"
+            DependsOn = "[xRemoteFile]ChromeDownload"
         }
     }
 }
