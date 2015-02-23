@@ -1,44 +1,52 @@
-$ConfigurationData = @{
-  AllNodes = @(
-    @{NodeName = 'Server1';Role='Web'},
-    @{NodeName = 'Server2';Role='FileShare'}
-    @{NodeName = 'Server3';Role=@('FileShare','Web')}
-  )
-}
+$MyData = 
+@{
+    AllNodes = 
+    @(
+        @{
+            NodeName = "*"
+            LogPath  = "C:\Logs"
+        },
+        @{
+            NodeName = "VM-1";
+            Role     = "WebServer"
+            SiteContents = "C:\Site1"
+            SiteName = "Website1"
+        },
+        @{
+            NodeName = "VM-2";
+            Role     = "SQLServer"
+        },
+        @{
+            NodeName = "VM-3";
+            Role     = "WebServer";
+            SiteContents = "C:\Site2"
+            SiteName = "Website3"
+        }
+    );
 
-configuration RoleConfiguration
+    NonNodeData = 
+    @{
+        ConfigFileContents = (Get-Content C:\Template\Config.xml)
+     }   
+} 
+
+configuration MyConfiguration
 {
-    param ($Roles)
+    Import-DscResource -ModuleName xWebAdministration -Name MSFT_xWebsite
 
-    switch ($Roles)
+    node $AllNodes.Where{$_.Role -eq "WebServer"}.NodeName
     {
-        'FileShare' {
-                        WindowsFeature FileSharing
-                        {
-                            Name = 'FS-FileServer'
-                        } 
-                    }
-        'Web'       {
-                        WindowsFeature Web
-                        {
-                            Name = 'web-Server'
-                        } 
-                    }        
-    }
-}
-
-configuration MyFirstServerConfig 
-{
-    node $allnodes.NodeName
-    {
-        WindowsFeature snmp
+        xWebsite Site
         {
-            Name = 'SNMP-Service'
-        }       
+            Name         = $Node.SiteName
+            PhysicalPath = $Node.SiteContents
+            Ensure       = "Present"
+        }
 
-        RoleConfiguration MyServerRoles
+        File ConfigFile
         {
-            Roles = $Node.Role
+            DestinationPath = $Node.SiteContents + "\\config.xml"
+            Contents = $ConfigurationData.NonNodeData.ConfigFileContents
         }
     }
 }
