@@ -1,0 +1,13 @@
+New-AzureResourceGroup `
+-Name "MyResourceGroup" `
+-Location "West Europe" `
+-GalleryTemplateIdentity Microsoft.WebSiteSQLDatabase.0.2.6-preview `
+-siteName "nnugdemowebsite24" `
+-hostingPlanName "MyHostingPlan" `
+-siteLocation "West Europe" `
+-serverName "mydb" `
+-serverLocation "West Europe" `
+-administratorLogin "Davlind" `
+-administratorLoginPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) `
+-databaseName "MyDbName" `
+-Verbose 
